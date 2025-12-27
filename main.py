@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import math
+import winsound
 
 def get_distance(p1, p2):
     return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
@@ -58,6 +59,7 @@ while cap.isOpened():
                 if COUNTER >= EYE_FPS_THRESHOLD:
                     cv2.putText(frame, "!!! DROWSY ALERT !!!", (30, 150), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 3)
+                    winsound.Beep(200, 500) # 200 -> very low frequency  2500->high freq
             else:
                 COUNTER = 0
             
