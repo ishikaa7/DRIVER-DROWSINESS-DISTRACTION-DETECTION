@@ -65,8 +65,8 @@ pip install opencv-python mediapipe
 ### 3. Calibration Settings
 Adjust these in config.py to match your specific camera angle and lighting:
 
-(Parameter)                      (Current Value )                          (Purpose)
-EAR_THRESHOLD                     0.15                   Threshold for eye closure (calibrated for low-angle views).
-MAR_THRESHOLD                     0.6                    Threshold for detecting a wide-open mouth (yawn).
-EYE_FPS_THRESHOLD                 30                     Minimum frames of closure before the alarm triggers (~1 sec).
-BEEP_FREQ                         200                    Frequency (Hz) of the alert tone (Low frequency).
+Parameter,Current Value,Purpose
+EAR_THRESHOLD,0.15,Threshold for eye closure (calibrated for low-angle views).
+MAR_THRESHOLD,0.6,Threshold for detecting a wide-open mouth (yawn).
+EYE_FPS_THRESHOLD,30,Frames of closure before the alarm triggers (~1 sec).
+BEEP_FREQ,200,Frequency (Hz) of the alert tone (Deep buzzer sound).
