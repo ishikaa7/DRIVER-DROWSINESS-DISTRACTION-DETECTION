@@ -16,3 +16,19 @@ def get_mar(mesh_points):
     v = get_distance(mesh_points[13], mesh_points[14])
     h = get_distance(mesh_points[78], mesh_points[308])
     return v / h
+
+def get_head_direction(mesh_points):
+    # Landmarks: Nose Tip (1), Left Side (234), Right Side (454)
+    nose = mesh_points[1]
+    left_side = mesh_points[234]
+    right_side = mesh_points[454]
+
+    # Calculate horizontal distances
+    d_left = get_distance(nose, left_side)
+    d_right = get_distance(nose, right_side)
+    
+    # Avoid division by zero
+    if d_right == 0: return 1 
+    
+    # Ratio of distances
+    return d_left / d_right

@@ -9,7 +9,8 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True)
 
 # Eye & Iris landmark indices
-COUNTER = 0
+COUNTER = 0 #count frames
+Yawn_counter = 0 #count farmes
 cap = cv2.VideoCapture(0)
 while cap.isOpened():
     ret, frame = cap.read()
@@ -45,15 +46,46 @@ while cap.isOpened():
             else:
                 COUNTER = 0
             
+            #Yawn logic
             if mar > config.MAR_THRESHOLD:
-                cv2.putText(frame, "YAWN DETECTED", (30, 200), 
+                Yawn_counter += 1
+                if Yawn_counter >= config.MAR_FPS_THRESHOLD:
+                    cv2.putText(frame, "YAWN DETECTED", (30, 200), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-                
-            # Visual Feedback: Draw Eyes (Green) and Irises (Yellow)
-            for idx in config.L_EYE + config.R_EYE:
-                cv2.circle(frame, mesh_points[idx], 1, (0, 255, 0), -1)
-            for idx in config.IRIS:
-                cv2.circle(frame, mesh_points[idx], 1, (0, 255, 255), -1)
+                    print(f"Mouth Open Frames: {Yawn_counter}")
+                    
+                    if not config.YAWN_ACTIVE:    #one yawn should not count morethan one time
+                        config.YAWN_TOTAL += 1
+                        config.YAWN_ACTIVE = True
+            else:
+                Yawn_counter = 0
+                config.YAWN_ACTIVE = False   #resent flag when mouth close
+
+            cv2.putText(frame, f"Total Yawns: {config.YAWN_TOTAL}", (30, 80), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+
+
+            if config.YAWN_TOTAL >= 5:
+                cv2.putText(frame, "ADVICE: PLEASE TAKE A BREAK", (30, 300), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 165, 255), 3) # Orange text
+
+            # --- HEAD POSE / DISTRACTION LOGIC ---
+            head_ratio = utils.get_head_direction(mesh_points)
+            
+            if head_ratio > config.LOOK_LEFT_THRESH or head_ratio < config.LOOK_RIGHT_THRESH:
+                config.DISTRACTION_COUNTER += 1
+                if config.DISTRACTION_COUNTER >= config.DISTRACTION_FPS_THRESHOLD:
+                    cv2.putText(frame, "!!! LOOK AT THE ROAD !!!", (30, 350), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+                    # Optional: winsound.Beep(800, 200)
+            else:
+                config.DISTRACTION_COUNTER = 0  
+
+            # # Visual Feedback: Draw Eyes (Green) and Irises (Yellow)
+            # for idx in config.L_EYE + config.R_EYE:
+            #     cv2.circle(frame, mesh_points[idx], 1, (0, 255, 0), -1)
+            # for idx in config.IRIS:
+            #     cv2.circle(frame, mesh_points[idx], 1, (0, 255, 255), -1)
 
     cv2.imshow('Drowsiness Monitor', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'): break
